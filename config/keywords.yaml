@@ -1,0 +1,48 @@
+# Catalyst keyword weights (SPEC starting values; tune from the journal).
+# Matching (implemented in phase 2): case-insensitive, whole words/phrases,
+# each phrase counts once per item. Any negative match in a headline caps
+# that item at headline_min_score - 1.
+
+keywords:
+  # Positive catalysts
+  "FDA approval": 10
+  "PDUFA date": 6
+  "Phase 3": 6
+  "Phase 2": 5
+  "IND clearance": 5
+  "first customer": 5
+  "first commercial order": 5
+  "merger agreement": 5
+  "definitive agreement": 5
+  "acquisition": 5
+  "uplisting to Nasdaq": 4
+  "uplisting to NYSE American": 4
+
+  # Negative catalysts (dilution, distress)
+  "public offering": -8
+  "registered direct": -8
+  "private placement": -8
+  "warrants": -6
+  "convertible note": -6
+  "at-the-market": -6
+  "ATM": -6
+  "reverse stock split": -6
+  "delisting notice": -8
+  "Nasdaq deficiency": -8
+  "reverse merger": -5
+
+# Filing-based triggers, separate from keywords.
+# Dilution filings are triggers ONLY for fresh IPOs, never existing listings.
+filing_triggers:
+  ipo_low_float:
+    score: 6                      # S-1 followed by 424B4 pricing, float under float_max
+    forms: ["S-1", "424B4"]
+  refiled_s1:
+    score: 3                      # Form RW (withdrawn), then S-1 re-filed
+    forms: ["RW", "S-1"]
+  dilution_on_candidate:
+    score: -8                     # Follow-on S-1, S-3, 424B5, ATM prospectus
+    forms: ["S-1", "S-3", "424B5"]
+
+# Same dilution forms on a ticker already held -> exit signal (exit rule 1).
+dilution_exit_forms: ["S-1", "S-3", "424B5"]
