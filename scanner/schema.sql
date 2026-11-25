@@ -13,14 +13,27 @@ CREATE TABLE IF NOT EXISTS raw_items (
     ingested_at     TEXT    NOT NULL,
     run_date        TEXT    NOT NULL,
     cik             TEXT,
-    ticker          TEXT,
+    ticker          TEXT,                          -- primary (first) matched ticker
     form_type       TEXT,                          -- EDGAR form, NULL for wire items
+    accession       TEXT,                          -- EDGAR accession number
+    match_note      TEXT,                          -- why no ticker matched (NULL if matched)
     headline        TEXT,
     headline_norm   TEXT,                          -- normalized headline for de-dup #2
     text_hash       TEXT    NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_raw_items_ticker_headline ON raw_items (ticker, headline_norm);
 CREATE INDEX IF NOT EXISTS ix_raw_items_run_date ON raw_items (run_date);
+
+-- Tickers matched to each raw item (a release can name more than one company).
+-- Added in schema v2.
+CREATE TABLE IF NOT EXISTS item_tickers (
+    raw_item_id  INTEGER NOT NULL REFERENCES raw_items (id) ON DELETE CASCADE,
+    ticker       TEXT    NOT NULL,
+    exchange     TEXT,                              -- normalized, e.g. 'NASDAQ', 'NYSE AMERICAN'
+    method       TEXT    NOT NULL,                  -- 'cik' | 'pattern'
+    PRIMARY KEY (raw_item_id, ticker)
+);
+CREATE INDEX IF NOT EXISTS ix_item_tickers_ticker ON item_tickers (ticker);
 
 -- Every scored item, including rejects, so thresholds can be tuned later.
 CREATE TABLE IF NOT EXISTS candidates (
@@ -36,7 +49,7 @@ CREATE TABLE IF NOT EXISTS candidates (
     risk_penalty      REAL,
     risk_flags        TEXT,                        -- JSON {flag: penalty}
     final_score       REAL,
-    passed            INTEGER NOT NULL DEFAULT 0 CHECK (passed IN (0, 1)),
+    passed            INTEGER NOT NULL DEFAULT 0 CHECK (passed IN (0, 1)),  -- survived every stage run so far
     drop_stage        TEXT,                        -- stage where it was dropped (NULL if passed)
     drop_reason       TEXT,                        -- human-readable reason (NULL if passed)
     rank              INTEGER

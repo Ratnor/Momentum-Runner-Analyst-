@@ -1,0 +1,42 @@
+{
+ "cik": "0004444444",
+ "name": "PRICED IPO CORP",
+ "sic": "2834",
+ "sicDescription": "x",
+ "tickers": [
+  "PIPO"
+ ],
+ "exchanges": [
+  "Nasdaq"
+ ],
+ "filings": {
+  "recent": {
+   "accessionNumber": [
+    "0004444444-26-000003",
+    "0004444444-26-000002",
+    "0004444444-26-000001"
+   ],
+   "filingDate": [
+    "2026-11-25",
+    "2026-10-15",
+    "2026-09-01"
+   ],
+   "acceptanceDateTime": [
+    "2026-11-25T08:00:00.000Z",
+    "2026-10-15T08:00:00.000Z",
+    "2026-09-01T08:00:00.000Z"
+   ],
+   "form": [
+    "424B4",
+    "S-1/A",
+    "S-1"
+   ],
+   "primaryDocument": [
+    "d.htm",
+    "d.htm",
+    "d.htm"
+   ]
+  },
+  "files": []
+ }
+}

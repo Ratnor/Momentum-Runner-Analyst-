@@ -149,3 +149,25 @@ def test_cli_creates_db(tmp_path, capsys):
     assert journal.main([str(path)]) == 0
     assert path.exists()
     assert "Journal ready" in capsys.readouterr().out
+
+
+def test_upgrades_v1_database(tmp_path):
+    """A DB created by the phase-1 schema gains the v2 columns and table, keeping its rows."""
+    path = tmp_path / "v1.db"
+    conn = sqlite3.connect(path)
+    conn.executescript(
+        "CREATE TABLE raw_items (id INTEGER PRIMARY KEY, source TEXT NOT NULL, url TEXT NOT NULL UNIQUE,"
+        " published_at TEXT, ingested_at TEXT NOT NULL, run_date TEXT NOT NULL, cik TEXT, ticker TEXT,"
+        " form_type TEXT, headline TEXT, headline_norm TEXT, text_hash TEXT NOT NULL);"
+        "INSERT INTO raw_items (source, url, ingested_at, run_date, text_hash)"
+        " VALUES ('edgar', 'u', 't', 'd', 'h');"
+        "PRAGMA user_version = 1;"
+    )
+    conn.close()
+    conn = init_db(path)
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(raw_items)")}
+    assert {"accession", "match_note"} <= cols
+    assert "item_tickers" in table_names(conn)
+    assert conn.execute("SELECT COUNT(*) FROM raw_items").fetchone()[0] == 1
+    assert conn.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
+    conn.close()

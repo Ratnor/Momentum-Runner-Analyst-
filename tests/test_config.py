@@ -130,10 +130,25 @@ def test_empty_file(tmp_path):
 
 
 def test_duplicate_keywords_rejected(write_yaml):
-    data = {
-        "keywords": {"FDA approval": 10, "fda APPROVAL": 9, "public offering": -8},
-        "filing_triggers": {},
-        "dilution_exit_forms": [],
-    }
+    import yaml
+
+    from scanner.config import DEFAULT_CONFIG_DIR
+
+    data = yaml.safe_load((DEFAULT_CONFIG_DIR / "keywords.yaml").read_text(encoding="utf-8"))
+    data["keywords"]["fda APPROVAL"] = 9
     with pytest.raises(ConfigError, match="duplicate"):
         load_keywords(write_yaml(data, "keywords.yaml"))
+
+
+def test_settings_url_templates_checked(settings_dict, write_yaml):
+    settings_dict["sources"]["yahoo_headline_url"] = "https://example.com/rss"
+    with pytest.raises(ConfigError, match="ticker"):
+        load_settings(write_yaml(settings_dict))
+
+
+def test_real_sources_config():
+    s = load_settings()
+    assert {f.name for f in s.sources.wire_feeds} == {
+        "globenewswire", "prnewswire", "businesswire", "accesswire"
+    }
+    assert s.sources.sec_user_agent_env == "SEC_USER_AGENT"

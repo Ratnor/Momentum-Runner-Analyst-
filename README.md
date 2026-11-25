@@ -9,7 +9,7 @@ the strategy can be judged on 6–8 weeks of forward results before any real mon
 | Phase | Status |
 | --- | --- |
 | 1. Skeleton: config loading, SQLite schema, `Broker` interface, CI | ✅ done |
-| 2. Ingest + scoring | not started |
+| 2. Ingest + scoring: EDGAR + RSS adapters, ticker matching, keyword scorer | ✅ built — live check via *Ingest dry run* workflow |
 | 3. Filters + risk flags | not started |
 | 4. Sizing + paper broker | not started |
 | 5. Nightly run + alerts | not started |
@@ -26,7 +26,12 @@ scanner/schema.sql        journal tables (raw_items, candidates, candidate_filte
 scanner/journal.py        creates data/scanner.db from the schema; connections
 scanner/models.py         DailyBar, OrderTicket, Fill, Position
 scanner/brokers/base.py   the Broker interface every broker implements
-scanner/sources/          data adapters (phase 2-3)
+scanner/sources/http.py  one HTTP client: User-Agent, SEC rate limit, retries, daily cache
+scanner/sources/edgar.py  latest filings, CIK<->ticker map, filing history, 8-K press releases
+scanner/sources/wires.py  newswire RSS + Yahoo per-ticker headlines
+scanner/matching.py       item -> ticker(s): by CIK (EDGAR) or "(Nasdaq: ABCD)" (wires)
+scanner/scoring.py        keyword scorer, negative cap, catalyst age, filing triggers
+scanner/ingest.py         stages 1-3 end to end; journals every item and candidate
 scanner/strategies/       entry/exit strategies (phase 4)
 backtest/                 exit-rule comparison (phase 6)
 tests/                    pytest, no network calls
@@ -38,7 +43,14 @@ tests/                    pytest, no network calls
 pip install -e ".[dev]"
 pytest                    # run the tests
 python -m scanner.journal # create/upgrade data/scanner.db
+SEC_USER_AGENT="Your Name you@example.com" python -m scanner.ingest --dry-run
 ```
+
+## GitHub secrets
+
+| Secret | Needed for |
+| --- | --- |
+| `SEC_USER_AGENT` | All EDGAR sources. SEC requires a name and email, e.g. `Jane Doe jane@example.com`. Without it EDGAR is skipped and only newswires run. |
 
 ## Rules the journal enforces
 

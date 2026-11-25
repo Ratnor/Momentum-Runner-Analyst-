@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Latest Filings - Tue, 25 Nov 2026 17:30:00 EST</title>
+<link rel="alternate" href="/cgi-bin/browse-edgar?action=getcurrent"/>
+<id>https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent</id>
+<updated>2026-11-25T17:30:00-05:00</updated>
+<entry>
+<title>SC 13D - ZETAGEN INC (0006666666) (Subject)</title>
+<link rel="alternate" type="text/html" href="https://www.sec.gov/Archives/edgar/data/6666666/000987654326000011/0009876543-26-000011-index.htm"/>
+<summary type="html"> &lt;b&gt;Filed:&lt;/b&gt; 2026-11-25 &lt;b&gt;AccNo:&lt;/b&gt; 0009876543-26-000011 &lt;b&gt;Size:&lt;/b&gt; 312 KB</summary>
+<updated>2026-11-25T10:00:00-05:00</updated>
+<category scheme="https://www.sec.gov/" label="form type" term="SC 13D"/>
+<id>urn:tag:sec.gov,2008:accession-number=0009876543-26-000011</id>
+</entry>
+<entry>
+<title>SC 13D - BIG FUND LP (0009876543) (Filed by)</title>
+<link rel="alternate" type="text/html" href="https://www.sec.gov/Archives/edgar/data/9876543/000987654326000011/0009876543-26-000011-index.htm"/>
+<summary type="html"> &lt;b&gt;Filed:&lt;/b&gt; 2026-11-25 &lt;b&gt;AccNo:&lt;/b&gt; 0009876543-26-000011 &lt;b&gt;Size:&lt;/b&gt; 312 KB</summary>
+<updated>2026-11-25T10:00:00-05:00</updated>
+<category scheme="https://www.sec.gov/" label="form type" term="SC 13D"/>
+<id>urn:tag:sec.gov,2008:accession-number=0009876543-26-000011</id>
+</entry>
+</feed>

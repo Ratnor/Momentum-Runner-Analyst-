@@ -132,6 +132,29 @@ class DataConfig:
 
 
 @dataclass(frozen=True)
+class WireFeed:
+    name: str
+    url: str
+
+
+@dataclass(frozen=True)
+class SourcesConfig:
+    sec_user_agent_env: str
+    generic_user_agent: str
+    ticker_map_url: str
+    submissions_url: str
+    edgar_current_url: str
+    edgar_page_size: int
+    edgar_max_pages: int
+    edgar_forms: list[str]
+    edgar_release_items: list[str]
+    edgar_max_release_fetches: int
+    max_tickers_per_item: int
+    wire_feeds: list[WireFeed]
+    yahoo_headline_url: str
+
+
+@dataclass(frozen=True)
 class ScheduleConfig:
     timezone: str
     market_calendar: str
@@ -165,6 +188,7 @@ class Settings:
     exits: ExitsConfig
     broker: BrokerConfig
     data: DataConfig
+    sources: SourcesConfig
     schedule: ScheduleConfig
     alerts: AlertsConfig
     backtest: BacktestConfig
@@ -182,9 +206,18 @@ class FilingTrigger:
 
 
 @dataclass(frozen=True)
+class FilingRules:
+    registration_forms: list[str]
+    withdrawal_forms: list[str]
+    periodic_report_forms: list[str]
+    ipo_lookback_days: int
+
+
+@dataclass(frozen=True)
 class KeywordConfig:
     keywords: dict[str, float]
     filing_triggers: dict[str, FilingTrigger]
+    filing_rules: FilingRules
     dilution_exit_forms: list[str]
 
 
@@ -341,6 +374,18 @@ def _validate_settings(s: Settings) -> None:
     )
     _check(s.data.http_max_retries >= 0, "data.http_max_retries must be >= 0")
 
+    src = s.sources
+    _check(1 <= src.edgar_page_size <= 100, "sources.edgar_page_size must be in [1, 100]")
+    _check(src.edgar_max_pages >= 1, "sources.edgar_max_pages must be >= 1")
+    _check(src.edgar_max_release_fetches >= 0, "sources.edgar_max_release_fetches must be >= 0")
+    _check(src.max_tickers_per_item >= 1, "sources.max_tickers_per_item must be >= 1")
+    names = [f.name for f in src.wire_feeds]
+    _check(len(names) == len(set(names)), "sources.wire_feeds names must be unique")
+    for tmpl, field in ((src.submissions_url, "{cik"), (src.yahoo_headline_url, "{ticker}")):
+        _check(field in tmpl, f"sources: URL template {tmpl!r} must contain {field}")
+    for field in ("{form}", "{start}", "{count}"):
+        _check(field in src.edgar_current_url, f"sources.edgar_current_url must contain {field}")
+
     _check(s.alerts.primary != s.alerts.fallback, "alerts.fallback must differ from alerts.primary")
 
     b = s.backtest
@@ -357,6 +402,10 @@ def _validate_keywords(k: KeywordConfig) -> None:
     dupes = sorted({kw for kw in lowered if lowered.count(kw) > 1})
     _check(not dupes, f"keywords: duplicate phrases (case-insensitive): {dupes}")
     _check(any(w < 0 for w in k.keywords.values()), "keywords: need at least one negative keyword")
+    required = {"ipo_low_float", "refiled_s1", "dilution_on_candidate"}
+    missing = required - set(k.filing_triggers)
+    _check(not missing, f"filing_triggers: missing {sorted(missing)}")
+    _check(k.filing_rules.ipo_lookback_days >= 1, "filing_rules.ipo_lookback_days must be >= 1")
 
 
 # --------------------------------------------------------------------------- #

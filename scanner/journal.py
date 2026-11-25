@@ -17,10 +17,20 @@ from pathlib import Path
 
 from scanner.config import REPO_ROOT, load_settings
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+
+# Steps that upgrade an existing DB *to* the given version. New tables come from
+# schema.sql (CREATE ... IF NOT EXISTS); only column changes need a step here.
+MIGRATIONS: dict[int, tuple[str, ...]] = {
+    2: (
+        "ALTER TABLE raw_items ADD COLUMN accession TEXT",
+        "ALTER TABLE raw_items ADD COLUMN match_note TEXT",
+    ),
+}
 
 EXPECTED_TABLES = (
     "raw_items",
+    "item_tickers",
     "candidates",
     "candidate_filters",
     "tickets",
@@ -54,6 +64,10 @@ def init_db(path: str | Path) -> sqlite3.Connection:
         raise RuntimeError(
             f"{p} has schema version {current}, newer than this code ({SCHEMA_VERSION})"
         )
+    if 0 < current < SCHEMA_VERSION:
+        for version in range(current + 1, SCHEMA_VERSION + 1):
+            for stmt in MIGRATIONS.get(version, ()):
+                conn.execute(stmt)
     conn.executescript(schema_sql())
     conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
     conn.commit()

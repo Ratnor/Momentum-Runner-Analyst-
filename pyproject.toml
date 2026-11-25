@@ -9,6 +9,8 @@ description = "Low-float micro-cap momentum runner scanner with paper broker and
 requires-python = ">=3.12"
 dependencies = [
     "PyYAML>=6.0",
+    "requests>=2.31",
+    "feedparser>=6.0",
 ]
 
 [project.optional-dependencies]

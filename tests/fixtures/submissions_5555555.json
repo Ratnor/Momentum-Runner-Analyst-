@@ -1,0 +1,42 @@
+{
+ "cik": "0005555555",
+ "name": "OLDCO THERAPEUTICS",
+ "sic": "2836",
+ "sicDescription": "x",
+ "tickers": [
+  "OLDC"
+ ],
+ "exchanges": [
+  "Nasdaq"
+ ],
+ "filings": {
+  "recent": {
+   "accessionNumber": [
+    "0005555555-26-000020",
+    "0005555555-26-000019",
+    "0005555555-26-000005"
+   ],
+   "filingDate": [
+    "2026-11-25",
+    "2026-11-10",
+    "2026-03-01"
+   ],
+   "acceptanceDateTime": [
+    "2026-11-25T08:00:00.000Z",
+    "2026-11-10T08:00:00.000Z",
+    "2026-03-01T08:00:00.000Z"
+   ],
+   "form": [
+    "S-3",
+    "10-Q",
+    "10-K"
+   ],
+   "primaryDocument": [
+    "d.htm",
+    "d.htm",
+    "d.htm"
+   ]
+  },
+  "files": []
+ }
+}

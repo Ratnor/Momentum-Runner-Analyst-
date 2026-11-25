@@ -1,0 +1,45 @@
+name: Ingest dry run
+
+# Live check of every data source: fetch today's filings and headlines, match
+# tickers, score them, and print the list. Writes nothing to the journal.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scanner/sources/**"
+      - "scanner/ingest.py"
+      - "scanner/matching.py"
+      - "scanner/scoring.py"
+      - "config/**"
+      - ".github/workflows/dry_run.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -e .
+
+      - name: Live dry run
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          python -m scanner.ingest --dry-run --output reports/dry_run.md
+          cat reports/dry_run.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dry-run-report
+          path: reports/dry_run.md

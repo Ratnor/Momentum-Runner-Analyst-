@@ -1,0 +1,34 @@
+# Fixture headlines and the exact score the keyword table must give them.
+# headline_min_score = 5 (settings.yaml). "capped" = a negative keyword capped it at 4.
+- {headline: "Acme Receives FDA Approval for Lead Candidate", score: 10, matched: ["FDA approval"]}
+- {headline: "Acme Announces PDUFA Date of March 3, 2027", score: 6, matched: ["PDUFA date"]}
+- {headline: "Acme Reports Positive Phase 3 Topline Data", score: 6, matched: ["Phase 3"]}
+- {headline: "Acme Initiates Phase 2 Trial in Glioblastoma", score: 5, matched: ["Phase 2"]}
+- {headline: "Acme Receives IND Clearance from FDA", score: 5, matched: ["IND clearance"]}
+- {headline: "NovaTech Lands First Customer for Edge Platform", score: 5, matched: ["first customer"]}
+- {headline: "NovaTech Receives First Commercial Order", score: 5, matched: ["first commercial order"]}
+- {headline: "Acme Enters Into Definitive Merger Agreement", score: 5, matched: ["merger agreement"]}
+- {headline: "Acme Signs Definitive Agreement for Acquisition of Beta", score: 10, matched: ["definitive agreement", "acquisition"]}
+- {headline: "Acme Approved for Uplisting to Nasdaq", score: 4, matched: ["uplisting to Nasdaq"]}
+- {headline: "Acme Announces Uplisting to NYSE American", score: 4, matched: ["uplisting to NYSE American"]}
+- {headline: "Acme Prices $5 Million Public Offering", score: -8, matched: ["public offering"]}
+- {headline: "Acme Announces $3M Registered Direct Offering", score: -8, matched: ["registered direct"]}
+- {headline: "Acme Closes Private Placement of Common Stock and Warrants", score: -14, matched: ["private placement", "warrants"]}
+- {headline: "Acme Issues Convertible Note to Investor", score: -6, matched: ["convertible note"]}
+- {headline: "Acme Enters Into At-The-Market (ATM) Sales Agreement", score: -12, matched: ["at-the-market", "ATM"]}
+- {headline: "Acme Establishes At the Market Offering Program", score: -6, matched: ["at-the-market"]}
+- {headline: "Acme Announces 1-for-20 Reverse Stock Split", score: -6, matched: ["reverse stock split"]}
+- {headline: "Acme Receives Delisting Notice from Exchange", score: -8, matched: ["delisting notice"]}
+- {headline: "Acme Receives Nasdaq Deficiency Letter", score: -8, matched: ["Nasdaq deficiency"]}
+- {headline: "Acme and Beta Complete Reverse Merger", score: -5, matched: ["reverse merger"]}
+# Positive + negative: raw 6 - 8 = -2, already below the cap, stays -2.
+- {headline: "Acme Reports Phase 3 Success, Announces Registered Direct Offering", score: -2, matched: ["Phase 3", "registered direct"]}
+# Positive + negative: raw 10 + 5 - 8 = 7, capped to headline_min_score - 1 = 4.
+- {headline: "Acme Wins FDA Approval and Closes Acquisition; Concurrent Private Placement", score: 4, capped: true, matched: ["FDA approval", "acquisition", "private placement"]}
+# Case-insensitive; each keyword counts once.
+- {headline: "acme: fda approval granted -- FDA APPROVAL confirmed", score: 10, matched: ["FDA approval"]}
+# Whole words only.
+- {headline: "Batman Diagnostics Reports Results", score: 0, matched: []}
+- {headline: "Acme Completes Phase 30 Enrollment", score: 0, matched: []}
+- {headline: "Acme Doses First Patient in Phase 2b Study", score: 0, matched: []}
+- {headline: "Acme Reports Third Quarter Results", score: 0, matched: []}

@@ -81,6 +81,31 @@ data:
   http_timeout_sec: 20
   http_max_retries: 3
 
+sources:
+  # SEC requires a User-Agent with a name and email. It is read from this
+  # environment variable (a GitHub secret), never stored in the repo.
+  sec_user_agent_env: SEC_USER_AGENT
+  generic_user_agent: "Mozilla/5.0 (compatible; MomentumScanner/0.1)"
+  ticker_map_url: "https://www.sec.gov/files/company_tickers_exchange.json"
+  submissions_url: "https://data.sec.gov/submissions/CIK{cik:010d}.json"
+  edgar_current_url: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type={form}&company=&dateb=&owner=include&start={start}&count={count}&output=atom"
+  edgar_page_size: 100            # max the feed allows
+  edgar_max_pages: 10             # per form, newest first; stops early on already-seen pages
+  edgar_forms: ["8-K", "S-1", "424B4", "RW", "S-3", "424B5"]
+  edgar_release_items: ["7.01", "8.01"]   # 8-K items that usually carry a press release (EX-99.1)
+  edgar_max_release_fetches: 200  # cap on EX-99.1 fetches per run
+  max_tickers_per_item: 3         # more distinct tickers than this = roundup article, not a catalyst
+  wire_feeds:                     # verify with the dry-run workflow; edit here if one moves
+    - name: globenewswire
+      url: "https://www.globenewswire.com/RssFeed/orgclass/1/feedTitle/GlobeNewswire%20-%20News%20about%20Public%20Companies"
+    - name: prnewswire
+      url: "https://www.prnewswire.com/rss/news-releases-list.rss"
+    - name: businesswire
+      url: "https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFpRWQ=="
+    - name: accesswire
+      url: "https://www.accessnewswire.com/newsroom/api/rss"
+  yahoo_headline_url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&region=US&lang=en-US"
+
 schedule:
   timezone: America/New_York
   market_calendar: NYSE

@@ -31,18 +31,25 @@ keywords:
   "Nasdaq deficiency": -8
   "reverse merger": -5
 
-# Filing-based triggers, separate from keywords.
+# Filing-based triggers, separate from keywords. `forms` = the filing that fires it.
 # Dilution filings are triggers ONLY for fresh IPOs, never existing listings.
+# "Existing listing" = the company filed a periodic report before this filing.
 filing_triggers:
   ipo_low_float:
-    score: 6                      # S-1 followed by 424B4 pricing, float under float_max
-    forms: ["S-1", "424B4"]
+    score: 6                      # 424B4 pricing after an S-1, no prior periodic reports
+    forms: ["424B4"]
   refiled_s1:
-    score: 3                      # Form RW (withdrawn), then S-1 re-filed
-    forms: ["RW", "S-1"]
+    score: 3                      # S-1 re-filed after a Form RW withdrawal
+    forms: ["S-1"]
   dilution_on_candidate:
-    score: -8                     # Follow-on S-1, S-3, 424B5, ATM prospectus
-    forms: ["S-1", "S-3", "424B5"]
+    score: -8                     # follow-on S-1, S-3, 424B5 (ATM), 424B4 on an existing listing
+    forms: ["S-1", "S-3", "424B5", "424B4"]
+
+filing_rules:
+  registration_forms: ["S-1", "S-1/A"]
+  withdrawal_forms: ["RW"]
+  periodic_report_forms: ["10-K", "10-Q", "20-F", "40-F", "10-K/A", "10-Q/A"]
+  ipo_lookback_days: 365          # S-1 / RW must be this recent to count
 
 # Same dilution forms on a ticker already held -> exit signal (exit rule 1).
 dilution_exit_forms: ["S-1", "S-3", "424B5"]
